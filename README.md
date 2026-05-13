@@ -17,8 +17,7 @@ This is an npm-workspaces monorepo with two entry points on top of one shared li
 costco-transfer/
 ├─ lib/   @costco-transfer/lib   — shared types, hashes, page-side fns, reconcile
 ├─ cli/   costco-transfer-cli    — Node CLI (CDP-driven, good for agent/headless use)
-├─ ext/   costco-transfer-ext    — Chrome extension MV3 (recommended for humans)
-└─ docs/v1-artifacts/            — historical v1 outputs
+└─ ext/   costco-transfer-ext    — Chrome extension MV3 (recommended for humans)
 ```
 
 Pick one entry point:
