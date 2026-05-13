@@ -1,0 +1,15 @@
+node_modules/
+*.log
+.DS_Store
+
+# Build outputs
+ext/dist/
+
+# Per-run artifacts (CLI writes these to cwd)
+costco-cart-*.json
+costco-cart-*-match.json
+costco-cart-*-reconcile.md
+costco-cart-raw-*.json
+
+# Historical personal data — v1 development artifacts
+docs/v1-artifacts/

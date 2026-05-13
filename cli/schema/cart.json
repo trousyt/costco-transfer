@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "InstacartCostcoCartExport",
+  "type": "object",
+  "required": ["source", "captured_at", "cart_id", "items"],
+  "properties": {
+    "source":        { "type": "string", "const": "instacart.com/store/costco" },
+    "captured_at":   { "type": "string", "format": "date-time" },
+    "cart_id":       { "type": "string" },
+    "shop_id":       { "type": "string" },
+    "retailer_id":   { "type": "string" },
+    "retailer_location_id": { "type": "string" },
+    "user": {
+      "type": "object",
+      "properties": {
+        "id":    { "type": "string" },
+        "guest": { "type": "boolean" }
+      },
+      "required": ["id", "guest"]
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["instacart_item_id", "product_id", "name", "quantity", "quantity_type"],
+        "properties": {
+          "instacart_item_id": { "type": "string" },
+          "product_id":        { "type": "string" },
+          "legacy_id":         { "type": ["string", "null"] },
+          "name":              { "type": "string" },
+          "brand":             { "type": ["string", "null"] },
+          "size":              { "type": ["string", "null"] },
+          "quantity":          { "type": "number", "minimum": 0 },
+          "quantity_type":     { "type": "string" },
+          "unit_price":        { "type": ["string", "null"] },
+          "full_price":        { "type": ["string", "null"] }
+        }
+      }
+    }
+  }
+}

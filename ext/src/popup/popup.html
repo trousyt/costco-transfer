@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Costco Cart Transfer</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Costco Cart Transfer</h1>
+      <p class="subtitle">Instacart Costco → Costco Sameday</p>
+    </header>
+
+    <main id="status" class="status idle">
+      <p id="status-msg">Checking tabs…</p>
+    </main>
+
+    <section id="controls" hidden>
+      <button id="transfer" class="primary">Transfer cart</button>
+      <button id="open-instacart" class="secondary" hidden>Open Instacart</button>
+      <button id="open-sameday" class="secondary" hidden>Open Sameday</button>
+    </section>
+
+    <section id="result" hidden>
+      <h2 id="result-outcome"></h2>
+      <p id="result-summary"></p>
+      <div id="result-counts"></div>
+      <details>
+        <summary>Per-item details</summary>
+        <table id="result-table">
+          <thead>
+            <tr><th>Status</th><th>Product</th><th>Qty</th><th>IC $</th><th>SD $</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </details>
+      <div id="result-warnings"></div>
+    </section>
+
+    <section id="history" hidden>
+      <h2>Past transfers</h2>
+      <div id="history-list"></div>
+      <button id="clear-history" class="secondary">Clear history</button>
+    </section>
+
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

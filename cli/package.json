@@ -1,0 +1,27 @@
+{
+  "name": "costco-transfer-cli",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Node CLI for Costco cart transfer. Uses CDP to drive a debug Chrome profile.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.6.0"
+  },
+  "bin": {
+    "costco-transfer": "./bin/transfer.mts"
+  },
+  "scripts": {
+    "start": "node --experimental-strip-types bin/transfer.mts",
+    "typecheck": "tsc --noEmit",
+    "launch-chrome": "scripts\\start-costco-chrome.cmd"
+  },
+  "dependencies": {
+    "@costco-transfer/lib": "*",
+    "chrome-remote-interface": "^0.33.3"
+  },
+  "devDependencies": {
+    "@types/chrome-remote-interface": "^0.33.0",
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.0"
+  }
+}

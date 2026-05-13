@@ -1,0 +1,16 @@
+{
+  "name": "costco-transfer",
+  "private": true,
+  "version": "0.2.0",
+  "description": "Instacart Costco → Costco Sameday cart transfer. CLI + Chrome extension share a core lib.",
+  "workspaces": ["lib", "cli", "ext"],
+  "scripts": {
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "build:ext": "npm run build --workspace=ext",
+    "watch:ext": "npm run watch --workspace=ext",
+    "start:cli": "npm start --workspace=cli"
+  },
+  "engines": {
+    "node": ">=22.6.0"
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CostcoTransferRunResult",
+  "type": "object",
+  "required": ["started_at", "ended_at", "outcome", "instacart", "sameday", "items"],
+  "properties": {
+    "started_at": { "type": "string", "format": "date-time" },
+    "ended_at":   { "type": "string", "format": "date-time" },
+    "outcome":    { "type": "string", "enum": ["success", "partial", "failure"] },
+    "instacart": {
+      "type": "object",
+      "required": ["user_id", "guest", "cart_id", "item_count"],
+      "properties": {
+        "user_id":    { "type": "string" },
+        "guest":      { "type": "boolean" },
+        "cart_id":    { "type": "string" },
+        "item_count": { "type": "integer" }
+      }
+    },
+    "sameday": {
+      "type": "object",
+      "required": ["user_id", "guest", "cart_id", "item_count_before", "item_count_after"],
+      "properties": {
+        "user_id":           { "type": "string" },
+        "guest":             { "type": "boolean" },
+        "cart_id":           { "type": "string" },
+        "item_count_before": { "type": "integer" },
+        "item_count_after":  { "type": "integer" }
+      }
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["product_id", "name", "intended_quantity", "status"],
+        "properties": {
+          "product_id":        { "type": "string" },
+          "name":              { "type": "string" },
+          "intended_quantity": { "type": "number" },
+          "final_quantity":    { "type": ["number", "null"] },
+          "status":            { "type": "string", "enum": ["added", "skipped_already_present", "skipped_missing_on_sameday", "failed"] },
+          "reason":            { "type": ["string", "null"] },
+          "instacart_price":   { "type": ["string", "null"] },
+          "sameday_price":     { "type": ["string", "null"] }
+        }
+      }
+    },
+    "warnings": { "type": "array", "items": { "type": "string" } }
+  }
+}
