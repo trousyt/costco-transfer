@@ -40,6 +40,10 @@ const resultWarnings = $<HTMLElement>("#result-warnings");
 const historyEl = $<HTMLElement>("#history");
 const historyList = $<HTMLElement>("#history-list");
 const clearHistoryBtn = $<HTMLButtonElement>("#clear-history");
+const clearIcBtn = $<HTMLButtonElement>("#clear-instacart");
+const clearConfirmEl = $<HTMLElement>("#clear-confirm");
+const clearConfirmYesBtn = $<HTMLButtonElement>("#clear-confirm-yes");
+const clearConfirmNoBtn = $<HTMLButtonElement>("#clear-confirm-no");
 
 function setStatus(kind: "idle" | "working" | "ok" | "warn" | "bad", msg: string) {
   statusEl.className = `status ${kind}`;
@@ -195,6 +199,8 @@ async function detectAndWire() {
   openIcBtn.hidden = !!ic;
   openSdBtn.hidden = !!sd;
   transferBtn.disabled = !(ic && sd);
+  clearIcBtn.hidden = !ic;
+  clearConfirmEl.hidden = true;
 
   if (!ic && !sd) setStatus("idle", "Open an Instacart Costco tab and a Sameday tab.");
   else if (!ic)   setStatus("idle", "Open an Instacart Costco tab.");
@@ -301,10 +307,14 @@ async function runTransfer() {
           quantityType: p.ci.quantityType,
         })),
       });
+      if (!addOutcome.ok) throw new Error(`Mutation failed: ${addOutcome.error}`);
     }
 
     const sdCartId: string = addOutcome.cart?.id ?? sdCartIdInitial ?? "";
-    if (!sdCartId) throw new Error("No Sameday cart_id available after mutation.");
+    if (!sdCartId) {
+      if (toAdd.length === 0) throw new Error("No items to transfer (all unavailable on Sameday) and no existing Sameday cart found.");
+      throw new Error("No Sameday cart_id available after mutation.");
+    }
 
     // Verify
     setStatus("working", "Verifying…");
@@ -402,6 +412,64 @@ function renderResult(r: RunResult) {
       return d;
     }),
   );
+}
+
+clearIcBtn.addEventListener("click", () => {
+  clearIcBtn.hidden = true;
+  clearConfirmEl.hidden = false;
+});
+clearConfirmNoBtn.addEventListener("click", () => {
+  clearConfirmEl.hidden = true;
+  clearIcBtn.hidden = false;
+});
+clearConfirmYesBtn.addEventListener("click", runClearCart);
+
+async function runClearCart() {
+  clearConfirmEl.hidden = true;
+  clearIcBtn.disabled = true;
+
+  try {
+    const ic = await findTab("https://www.instacart.com/");
+    if (!ic?.id) throw new Error("Instacart tab not found.");
+
+    setStatus("working", "Reading Instacart cart…");
+    const cartIdR = await runInTab(ic.id, "ISOLATED", pageReadCartId, {
+      hash: HASH.CartSwitcherSingleRetailerCartIds,
+      retailerId: COSTCO.retailerId,
+    });
+    if (!cartIdR.cart_id) throw new Error("No Costco cart found on Instacart.");
+
+    const cart = await runInTab(ic.id, "ISOLATED", pageReadCartData, {
+      hash: HASH.CartData,
+      cartId: cartIdR.cart_id,
+    });
+
+    if (cart.item_count === 0) {
+      setStatus("ok", "Instacart cart is already empty.");
+      return;
+    }
+
+    setStatus("working", `Clearing ${cart.item_count} item${cart.item_count === 1 ? "" : "s"}…`);
+
+    const outcome = await runInTab(ic.id, "MAIN", pageFireMutation, {
+      cartId: cartIdR.cart_id,
+      cartType: "grocery",
+      cartItemUpdates: cart.items.map((item) => ({
+        itemId: item.v4ItemId,
+        quantity: 0,
+        quantityType: item.quantityType,
+      })),
+    });
+
+    if (!outcome.ok) throw new Error(`Clear failed: ${outcome.error}`);
+    setStatus("ok", `Cleared ${cart.item_count} item${cart.item_count === 1 ? "" : "s"} from Instacart cart.`);
+    await chrome.tabs.reload(ic.id);
+  } catch (e) {
+    setStatus("bad", (e as Error).message || String(e));
+  } finally {
+    clearIcBtn.hidden = false;
+    clearIcBtn.disabled = false;
+  }
 }
 
 // Init

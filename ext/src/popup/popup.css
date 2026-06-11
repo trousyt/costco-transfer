@@ -46,7 +46,11 @@ button {
 button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
 button.primary:disabled { opacity: 0.5; cursor: not-allowed; }
 button.secondary { background: transparent; }
+button.danger { background: var(--bad); color: #fff; border-color: var(--bad); }
 button:hover:not(:disabled) { filter: brightness(1.05); }
+
+#clear-confirm:not([hidden]) { display: flex; align-items: center; gap: 8px; width: 100%; flex-wrap: wrap; }
+.clear-confirm-label { color: var(--warn); font-size: 12px; flex: 1 1 100%; }
 
 #result { margin-top: 10px; }
 #result h2 { font-size: 14px; margin: 8px 0 4px; }
