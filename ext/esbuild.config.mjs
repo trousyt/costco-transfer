@@ -12,6 +12,7 @@ import * as esbuild from "esbuild";
 import { cp, mkdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+import { genIcons } from "./scripts/gen-icons.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const srcDir = join(here, "src");
@@ -23,6 +24,9 @@ await mkdir(distDir, { recursive: true });
 // Static assets
 await cp(join(srcDir, "popup", "popup.html"), join(distDir, "popup.html"));
 await cp(join(srcDir, "popup", "popup.css"), join(distDir, "popup.css"));
+
+// Brand icons → dist/icons/*.png (16/32/48/128)
+await genIcons();
 
 const common = {
   bundle: true,

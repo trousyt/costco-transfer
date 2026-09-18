@@ -5,7 +5,19 @@
   "description": "Transfer an Instacart Costco cart to Costco Sameday in one click.",
   "action": {
     "default_popup": "dist/popup.html",
-    "default_title": "Costco Cart Transfer"
+    "default_title": "Costco Cart Transfer",
+    "default_icon": {
+      "16": "dist/icons/icon-16.png",
+      "32": "dist/icons/icon-32.png",
+      "48": "dist/icons/icon-48.png",
+      "128": "dist/icons/icon-128.png"
+    }
+  },
+  "icons": {
+    "16": "dist/icons/icon-16.png",
+    "32": "dist/icons/icon-32.png",
+    "48": "dist/icons/icon-48.png",
+    "128": "dist/icons/icon-128.png"
   },
   "background": {
     "service_worker": "dist/background.js",

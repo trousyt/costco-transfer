@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Costco Cart Transfer — Design System</title>
+<style>
+  :root {
+    --canvas: oklch(0.955 0.005 80);
+    --panel: #ffffff;
+    --line: oklch(0.89 0.008 75);
+    --ink: oklch(0.25 0.012 65);
+    --muted: oklch(0.54 0.012 65);
+    --faint: oklch(0.66 0.010 68);
+    --accent: oklch(0.62 0.170 45);
+    --sans: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+
+    /* popup token sets (canonical = dark) */
+    --d-bg: oklch(0.185 0.010 65); --d-surface: oklch(0.225 0.012 65); --d-surface-2: oklch(0.255 0.013 65);
+    --d-ink: oklch(0.965 0.004 80); --d-muted: oklch(0.66 0.012 70); --d-faint: oklch(0.50 0.012 70);
+    --d-line: oklch(0.31 0.012 65); --d-line-soft: oklch(0.27 0.012 65);
+
+    --l-bg: #ffffff; --l-surface: oklch(0.975 0.006 75); --l-surface-2: oklch(0.945 0.008 75);
+    --l-ink: oklch(0.255 0.014 60); --l-muted: oklch(0.52 0.014 62); --l-faint: oklch(0.63 0.012 65);
+    --l-line: oklch(0.89 0.010 70); --l-line-soft: oklch(0.925 0.008 72);
+
+    --amber: oklch(0.74 0.160 56); --amber-deep: oklch(0.61 0.170 45); --coral: oklch(0.67 0.180 30);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--canvas); color: var(--ink); font-family: var(--sans);
+    -webkit-font-smoothing: antialiased; line-height: 1.5;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 40px 140px; }
+
+  /* ---------- cover ---------- */
+  .cover { padding: 84px 0 56px; border-bottom: 1px solid var(--line); display: flex; gap: 40px; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; }
+  .cover-l { max-width: 600px; }
+  .eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin: 0 0 18px; }
+  h1 { font-size: 46px; line-height: 1.04; letter-spacing: -0.025em; margin: 0 0 18px; font-weight: 700; }
+  .cover-sub { font-size: 16px; line-height: 1.6; color: var(--muted); margin: 0; }
+  .cover-sub strong { color: var(--ink); font-weight: 600; }
+  .cover-mark { width: 116px; height: 116px; flex: none; filter: drop-shadow(0 12px 26px oklch(0.67 0.180 30 / 0.35)); }
+  .meta { display: flex; gap: 28px; margin-top: 30px; }
+  .meta div { font-size: 12px; color: var(--muted); }
+  .meta b { display: block; font-family: var(--mono); font-size: 12px; color: var(--ink); font-weight: 600; margin-top: 3px; }
+
+  /* ---------- section ---------- */
+  .sec { padding-top: 76px; }
+  .sec-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 6px; }
+  .sec-num { font-family: var(--mono); font-size: 12px; color: var(--accent); font-weight: 600; }
+  .sec-head h2 { font-size: 25px; letter-spacing: -0.02em; font-weight: 700; margin: 0; }
+  .sec-desc { font-size: 14.5px; color: var(--muted); margin: 0 0 30px; max-width: 620px; line-height: 1.6; }
+
+  .grid { display: grid; gap: 16px; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 1px 2px rgba(40,30,15,0.03); }
+  .label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+
+  /* ---------- swatches ---------- */
+  .sw-grid { grid-template-columns: repeat(4, 1fr); }
+  .sw { border: 1px solid var(--line); border-radius: 11px; overflow: hidden; background: var(--panel); }
+  .sw-chip { height: 70px; position: relative; }
+  .sw-chip.ring { box-shadow: inset 0 0 0 1px rgba(0,0,0,0.06); }
+  .sw-meta { padding: 9px 11px 11px; }
+  .sw-name { font-size: 12px; font-weight: 600; letter-spacing: -0.005em; }
+  .sw-tok { font-family: var(--mono); font-size: 10px; color: var(--faint); margin-top: 2px; }
+  .sw-val { font-family: var(--mono); font-size: 9.5px; color: var(--faint); margin-top: 4px; word-break: break-all; }
+  .theme-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 26px 0 12px; }
+  .theme-tag::before { content: ""; width: 9px; height: 9px; border-radius: 50%; }
+  .theme-tag.dark::before { background: var(--d-bg); box-shadow: inset 0 0 0 1px rgba(0,0,0,0.15); }
+  .theme-tag.light::before { background: var(--l-bg); box-shadow: inset 0 0 0 1px rgba(0,0,0,0.15); }
+  .theme-tag.accent::before { background: var(--coral); }
+
+  /* ---------- type ---------- */
+  .type-row { display: grid; grid-template-columns: 188px 1fr; gap: 28px; align-items: baseline; padding: 18px 0; border-top: 1px solid var(--line); }
+  .type-row:first-of-type { border-top: 0; }
+  .type-spec { font-family: var(--mono); font-size: 11px; color: var(--muted); line-height: 1.7; }
+  .type-spec b { color: var(--ink); }
+  .type-sample { color: var(--ink); min-width: 0; }
+  .families { grid-template-columns: 1fr 1fr; margin-bottom: 34px; }
+  .fam { padding: 22px 24px; }
+  .fam-glyphs { font-size: 34px; letter-spacing: -0.01em; margin-bottom: 12px; }
+  .fam-name { font-size: 14px; font-weight: 600; }
+  .fam-meta { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  /* ---------- spacing / radius / elevation ---------- */
+  .triple { grid-template-columns: 1fr 1fr 1fr; align-items: start; }
+  .card-pad { padding: 22px 24px 26px; }
+  .card-pad h3 { font-size: 14px; font-weight: 700; margin: 0 0 4px; }
+  .card-pad p { font-size: 12.5px; color: var(--muted); margin: 0 0 20px; }
+  .ramp { display: flex; flex-direction: column; gap: 11px; }
+  .ramp-row { display: flex; align-items: center; gap: 14px; }
+  .ramp-bar { height: 16px; border-radius: 4px; background: var(--coral); opacity: 0.9; }
+  .ramp-tok { font-family: var(--mono); font-size: 11px; color: var(--ink); width: 38px; }
+  .ramp-px { font-family: var(--mono); font-size: 10.5px; color: var(--faint); }
+  .radii { display: flex; flex-wrap: wrap; gap: 16px; }
+  .radii-item { text-align: center; }
+  .radii-box { width: 60px; height: 60px; background: linear-gradient(135deg, var(--amber), var(--coral)); border: 1px solid rgba(0,0,0,0.06); }
+  .radii-lbl { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-top: 7px; }
+  .elevs { display: flex; flex-direction: column; gap: 20px; }
+  .elev-row { display: flex; align-items: center; gap: 18px; }
+  .elev-box { width: 80px; height: 48px; border-radius: 10px; background: #fff; flex: none; }
+  .elev-box.e1 { box-shadow: 0 1px 2px rgba(40,30,15,0.06); }
+  .elev-box.e2 { box-shadow: 0 1px 2px rgba(40,30,15,0.04), 0 12px 30px -18px rgba(40,30,15,0.22); }
+  .elev-box.e3 { box-shadow: 0 18px 42px -26px rgba(40,30,15,0.4); }
+  .elev-box.glow { background: linear-gradient(118deg, var(--coral), var(--amber-deep)); box-shadow: 0 10px 22px -12px var(--coral); }
+  .elev-meta { font-size: 12.5px; }
+  .elev-meta b { font-weight: 600; }
+  .elev-meta span { display: block; font-family: var(--mono); font-size: 10px; color: var(--faint); margin-top: 3px; }
+
+  /* ---------- icon set ---------- */
+  .icon-hero { display: flex; gap: 30px; align-items: center; flex-wrap: wrap; padding: 30px 32px; }
+  .icon-hero .big-ico { width: 128px; height: 128px; flex: none; }
+  .icon-hero-txt { max-width: 360px; }
+  .icon-hero-txt h3 { font-size: 16px; margin: 0 0 8px; font-weight: 700; }
+  .icon-hero-txt p { font-size: 13px; color: var(--muted); margin: 0; line-height: 1.6; }
+  .icon-row { display: flex; align-items: flex-end; gap: 26px; padding: 26px 32px; border-top: 1px solid var(--line); flex-wrap: wrap; }
+  .icon-cell { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .icon-cell span { font-family: var(--mono); font-size: 10px; color: var(--muted); }
+  .var-grid { grid-template-columns: repeat(5, 1fr); }
+  .var { padding: 22px 14px 16px; text-align: center; }
+  .var svg { width: 56px; height: 56px; }
+  .var-name { font-size: 11.5px; font-weight: 600; margin-top: 14px; }
+  .var-use { font-family: var(--mono); font-size: 9.5px; color: var(--faint); margin-top: 3px; }
+  .toolbars { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 16px; }
+  .tbar { flex: 1; min-width: 280px; display: flex; align-items: center; gap: 8px; border-radius: 11px; padding: 10px; border: 1px solid var(--line); }
+  .tbar.light { background: oklch(0.96 0.004 80); }
+  .tbar.dark { background: oklch(0.22 0.008 65); border-color: oklch(0.30 0.01 65); }
+  .tbar .url { flex: 1; height: 28px; border-radius: 7px; display: flex; align-items: center; padding: 0 12px; font-family: var(--mono); font-size: 11px; }
+  .tbar.light .url { background: #fff; border: 1px solid var(--line); color: var(--muted); }
+  .tbar.dark .url { background: oklch(0.27 0.01 65); color: oklch(0.7 0.01 70); }
+  .tbar .ghost { width: 28px; height: 28px; border-radius: 7px; }
+  .tbar.light .ghost { background: oklch(0.90 0.006 80); }
+  .tbar.dark .ghost { background: oklch(0.30 0.01 65); }
+  .tbar .slot { width: 30px; height: 30px; border-radius: 7px; display: grid; place-items: center; }
+  .tbar.light .slot { background: oklch(0.90 0.01 70); }
+  .tbar.dark .slot { background: oklch(0.30 0.012 65); }
+
+  /* =========================================================
+     POPUP COMPONENT STYLES  (chrome-scoped tokens)
+     ========================================================= */
+  .chrome-dark {
+    --bg: var(--d-bg); --surface: var(--d-surface); --surface-2: var(--d-surface-2);
+    --ink: var(--d-ink); --c-muted: var(--d-muted); --c-faint: var(--d-faint);
+    --c-line: var(--d-line); --c-line-soft: var(--d-line-soft);
+    --ok: oklch(0.74 0.130 158); --warn: oklch(0.80 0.140 78); --bad: oklch(0.66 0.185 28);
+  }
+  .chrome-light {
+    --bg: var(--l-bg); --surface: var(--l-surface); --surface-2: var(--l-surface-2);
+    --ink: var(--l-ink); --c-muted: var(--l-muted); --c-faint: var(--l-faint);
+    --c-line: var(--l-line); --c-line-soft: var(--l-line-soft);
+    --ok: oklch(0.55 0.125 152); --warn: oklch(0.60 0.130 66); --bad: oklch(0.58 0.180 28);
+  }
+  .stage { padding: 26px; border-radius: 14px; display: flex; flex-wrap: wrap; gap: 22px; align-items: flex-start; }
+  .stage.on-dark { background: var(--d-bg); }
+  .stage.on-light { background: oklch(0.965 0.006 78); }
+  .stage .scolumn { display: flex; flex-direction: column; gap: 8px; }
+  .scap { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; }
+  .on-dark .scap { color: oklch(0.6 0.01 70); }
+  .on-light .scap { color: var(--muted); }
+
+  .cbox { background: var(--bg); color: var(--ink); font-family: var(--sans); border-radius: 13px; box-shadow: 0 0 0 1px var(--c-line-soft); width: 340px; }
+
+  /* header */
+  .ph { background: linear-gradient(118deg, var(--amber), var(--amber-deep)); padding: 14px 15px; border-radius: 13px 13px 0 0; }
+  .ph-top { display: flex; align-items: center; gap: 10px; }
+  .ph-mark { width: 28px; height: 28px; flex: none; display: grid; place-items: center; filter: drop-shadow(0 2px 4px rgba(60,20,0,0.25)); }
+  .ph-name { font-size: 14.5px; font-weight: 700; letter-spacing: -0.01em; color: #fff; white-space: nowrap; }
+  .ph-route { display: flex; align-items: center; gap: 7px; margin-top: 6px; padding-left: 38px; font-size: 11px; color: rgba(255,255,255,0.9); font-weight: 500; }
+  .ph-route .live { width: 7px; height: 7px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,0.28); }
+
+  /* status */
+  .status { border: 1px solid var(--c-line); border-radius: 11px; background: var(--surface); padding: 13px 14px; display: flex; align-items: center; gap: 12px; position: relative; overflow: hidden; }
+  .status::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--amber); }
+  .status.s-ready::before { background: var(--coral); }
+  .status.s-done::before { background: var(--ok); }
+  .status.s-error::before { background: var(--bad); }
+  .st-ico { width: 30px; height: 30px; flex: none; border-radius: 8px; display: grid; place-items: center; }
+  .st-body { min-width: 0; flex: 1; }
+  .st-kicker { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-muted); margin-bottom: 3px; }
+  .st-title { font-size: 13.5px; font-weight: 600; line-height: 1.3; color: var(--ink); }
+  .st-title .lo { color: var(--c-muted); font-weight: 500; }
+  .st-hero { display: flex; align-items: baseline; gap: 8px; }
+  .st-hero .big { font-size: 27px; font-weight: 700; letter-spacing: -0.02em; line-height: 0.95; color: var(--ink); }
+  .st-hero .cur { font-size: 13px; font-weight: 600; color: var(--c-muted); }
+  .st-sub { font-size: 12px; color: var(--c-muted); margin-top: 5px; }
+  .st-sub b { color: var(--ink); font-weight: 600; }
+  .st-track { height: 6px; border-radius: 4px; background: var(--surface-2); overflow: hidden; margin-top: 9px; }
+  .st-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--amber), var(--amber-deep)); }
+
+  /* buttons */
+  .btn { border: 0; cursor: pointer; font-family: var(--sans); font-weight: 600; font-size: 13.5px; border-radius: 10px; padding: 11px 16px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; }
+  .btn-primary { background: linear-gradient(118deg, var(--coral), var(--amber-deep)); color: #fff; box-shadow: 0 10px 22px -12px var(--coral), inset 0 1px 0 rgba(255,255,255,0.12); }
+  .btn-secondary { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--c-line); }
+  .btn-ghost { background: transparent; color: var(--c-muted); font-weight: 500; }
+  .btn-danger { background: transparent; color: var(--bad); box-shadow: inset 0 0 0 1.5px color-mix(in oklch, var(--bad) 36%, transparent); }
+  .btn[disabled] { opacity: 0.4; cursor: not-allowed; box-shadow: inset 0 0 0 1.5px var(--c-line-soft); background: transparent; color: var(--c-muted); }
+
+  /* history */
+  .hrow { display: flex; gap: 11px; background: var(--surface); border: 1px solid var(--c-line-soft); border-radius: 11px; padding: 11px 13px 11px 0; overflow: hidden; width: 290px; }
+  .hbar { width: 3px; align-self: stretch; flex: none; border-radius: 0 3px 3px 0; }
+  .hbar.ok { background: var(--ok); } .hbar.warn { background: var(--warn); } .hbar.bad { background: var(--bad); }
+  .hmain { flex: 1; min-width: 0; }
+  .htop { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .hwhen { font-size: 13px; font-weight: 600; letter-spacing: -0.005em; color: var(--ink); }
+  .hpill { font-family: var(--mono); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 7px; border-radius: 20px; white-space: nowrap; }
+  .hpill.ok { color: var(--ok); background: color-mix(in oklch, var(--ok) 16%, transparent); }
+  .hpill.warn { color: var(--warn); background: color-mix(in oklch, var(--warn) 16%, transparent); }
+  .hpill.bad { color: var(--bad); background: color-mix(in oklch, var(--bad) 18%, transparent); }
+  .hstats { display: flex; gap: 14px; margin-top: 7px; }
+  .stat { font-size: 11.5px; color: var(--c-faint); }
+  .stat b { font-family: var(--mono); font-weight: 600; font-size: 12.5px; margin-right: 3px; color: var(--c-faint); }
+  .stat.added b { color: var(--ok); } .stat.skip b { color: var(--warn); } .stat.fail b { color: var(--bad); }
+
+  .comp-card { padding: 0; overflow: hidden; }
+  .comp-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--line); }
+  .comp-head h3 { font-size: 14px; font-weight: 700; margin: 0; }
+  .comp-head .label { font-size: 9.5px; }
+  .comp-body { padding: 24px; }
+  .btn-matrix { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+
+  .footer { margin-top: 90px; padding-top: 28px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--muted); font-family: var(--mono); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+
+    <!-- ===================== COVER ===================== -->
+    <header class="cover">
+      <div class="cover-l">
+        <p class="eyebrow">Design System · v1.0 · Bold direction</p>
+        <h1>Costco Cart<br>Transfer</h1>
+        <p class="cover-sub">The visual language for the cart-transfer extension — a <strong>warm, utilitarian</strong> system built on a neutral grotesque, an amber-to-coral accent range, and a status-first popup. This document is the single source of truth for tokens, type, and components.</p>
+        <div class="meta">
+          <div>Surface<b>Chrome popup · 380px</b></div>
+          <div>Themes<b>Light · Dark</b></div>
+          <div>Type<b>Helvetica grotesque</b></div>
+        </div>
+      </div>
+      <svg class="cover-mark" viewBox="0 0 32 32"><rect width="32" height="32" rx="9" fill="oklch(0.67 0.180 30)"/><g fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M16 6 21.5 11 8.5 11"/><path d="M21.5 11 10.5 21"/><path d="M16 26 10.5 21 23.5 21"/></g></svg>
+    </header>
+
+    <!-- ===================== BRAND & ICON ===================== -->
+    <section class="sec">
+      <div class="sec-head"><span class="sec-num">01</span><h2>Brand &amp; icon</h2></div>
+      <p class="sec-desc">The mark is a swap of two arrows whose inner arms merge into one unbroken diagonal — a single fluid hand-off from Instacart to Costco Same-Day. It holds from 128&nbsp;px down to a 16&nbsp;px favicon.</p>
+
+      <div class="panel" style="margin-bottom:16px">
+        <div class="icon-hero">
+          <svg class="big-ico" viewBox="0 0 32 32"><rect width="32" height="32" rx="9" fill="oklch(0.67 0.180 30)"/><g fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M16 6 21.5 11 8.5 11"/><path d="M21.5 11 10.5 21"/><path d="M16 26 10.5 21 23.5 21"/></g></svg>
+          <div class="icon-hero-txt">
+            <h3>The merged swap</h3>
+            <p>Top arrow points to Same-Day; bottom arrow returns. Their inner arms share one diagonal stroke through the center — the “transfer” made literal. Stroke weight scales up at small sizes to stay legible.</p>
+          </div>
+          <div class="icon-row" style="border:0;padding:0;margin-left:auto">
+            <div class="icon-cell"><svg width="48" height="48" viewBox="0 0 32 32"><rect width="32" height="32" rx="9" fill="oklch(0.67 0.180 30)"/><g fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M16 6 21.5 11 8.5 11"/><path d="M21.5 11 10.5 21"/><path d="M16 26 10.5 21 23.5 21"/></g></svg><span>48</span></div>
+            <div class="icon-cell"><svg width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="32" rx="9" fill="oklch(0.67 0.180 30)"/><g fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M16 6 21.5 11 8.5 11"/><path d="M21.5 11 10.5 21"/><path d="M16 26 10.5 21 23.5 21"/></g></svg><span>32</span></div>
+            <div class="icon-cell"><svg width="16" height="16" viewBox="0 0 32 32"><rect width="32" height="32" rx="9" fill="oklch(0.67 0.180 30)"/><g fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M16 6 21.5 11 8.5 11"/><path d="M21.5 11 10.5 21"/><path d="M16 26 10.5 21 23.5 21"/></g></svg><span>16</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid var-grid">
+        <div class="panel var">
+          <svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="oklch(0.67 0.180 30)"/><g fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M16 6 21.5 11 8.5 11"/><path d="M21.5 11 10.5 21"/><path d="M16 26 10.5 21 23.5 21"/></g></svg>
+          <div class="var-name">Coral disc</div><div class="var-use">primary</div>
+        </div>
+        <div class="panel var">
+          <svg viewBox="0 0 32 32"><rect width="32" height="32" rx="9" fill="url(#g1)"/><defs><linearGradient id="g1" x1="0" y1="0" x2="32" y2="32"><stop stop-color="oklch(0.74 0.16 56)"/><stop offset="1" stop-color="oklch(0.61 0.17 45)"/></linearGradient></defs><g fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M16 6 21.5 11 8.5 11"/><path d="M21.5 11 10.5 21"/><path d="M16 26 10.5 21 23.5 21"/></g></svg>
+          <div class="var-name">Amber square</div><div class="var-use">alt</div>
+        </div>
+        <div class="panel var">
+          <svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="#fff"/><g fill="none" stroke="oklch(0.67 0.180 30)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M16 6 21.5 11 8.5 11"/><path d="M21.5 11 10.5 21"/><path d="M16 26 10.5 21 23.5 21"/></g></svg>
+          <div class="var-name">Inverse</div><div class="var-use">on-color / header</div>
+        </div>
+        <div class="panel var">
+          <svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="oklch(0.22 0.01 65)"/><g fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M16 6 21.5 11 8.5 11"/><path d="M21.5 11 10.5 21"/><path d="M16 26 10.5 21 23.5 21"/></g></svg>
+          <div class="var-name">Mono dark</div><div class="var-use">disabled / greyscale</div>
+        </div>
+        <div class="panel var">
+          <svg viewBox="0 0 32 32"><rect x="1" y="1" width="30" height="30" rx="8.5" fill="none" stroke="oklch(0.67 0.180 30)" stroke-width="1.5"/><g fill="none" stroke="oklch(0.67 0.180 30)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M16 6 21.5 11 8.5 11"/><path d="M21.5 11 10.5 21"/><path d="M16 26 10.5 21 23.5 21"/></g></svg>
+          <div class="var-name">Outline</div><div class="var-use">stamps / print</div>
+        </div>
+      </div>
+
+      <div class="toolbars">
+        <div class="tbar light">
+          <div class="ghost"></div>
+          <div class="url">sameday.costco.com</div>
+          <div class="slot"><svg width="20" height="20" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="oklch(0.67 0.180 30)"/><g fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M16 6 21.5 11 8.5 11"/><path d="M21.5 11 10.5 21"/><path d="M16 26 10.5 21 23.5 21"/></g></svg></div>
+        </div>
+        <div class="tbar dark">
+          <div class="ghost"></div>
+          <div class="url">sameday.costco.com</div>
+          <div class="slot"><svg width="20" height="20" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="oklch(0.67 0.180 30)"/><g fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M16 6 21.5 11 8.5 11"/><path d="M21.5 11 10.5 21"/><path d="M16 26 10.5 21 23.5 21"/></g></svg></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== COLOR ===================== -->
+    <section class="sec">
+      <div class="sec-head"><span class="sec-num">02</span><h2>Color</h2></div>
+      <p class="sec-desc">One warm accent range carries every action; status uses a restrained green / amber / coral set tuned per theme. Neutrals are warm-tinted (hue ≈ 65) so nothing reads cold next to the amber.</p>
+
+      <div class="theme-tag accent">Accent &amp; status</div>
+      <div class="grid sw-grid">
+        <div class="sw"><div class="sw-chip" style="background:oklch(0.74 0.160 56)"></div><div class="sw-meta"><div class="sw-name">Amber</div><div class="sw-tok">--amber</div><div class="sw-val">oklch(.74 .16 56)</div></div></div>
+        <div class="sw"><div class="sw-chip" style="background:oklch(0.61 0.170 45)"></div><div class="sw-meta"><div class="sw-name">Amber deep</div><div class="sw-tok">--amber-deep</div><div class="sw-val">oklch(.61 .17 45)</div></div></div>
+        <div class="sw"><div class="sw-chip" style="background:oklch(0.67 0.180 30)"></div><div class="sw-meta"><div class="sw-name">Coral</div><div class="sw-tok">--coral</div><div class="sw-val">oklch(.67 .18 30)</div></div></div>
+        <div class="sw"><div class="sw-chip" style="background:linear-gradient(118deg,oklch(0.67 0.18 30),oklch(0.61 0.17 45))"></div><div class="sw-meta"><div class="sw-name">Action gradient</div><div class="sw-tok">primary button</div><div class="sw-val">coral → amber-deep</div></div></div>
+        <div class="sw"><div class="sw-chip" style="background:oklch(0.74 0.130 158)"></div><div class="sw-meta"><div class="sw-name">Success</div><div class="sw-tok">--ok</div><div class="sw-val">green · added</div></div></div>
+        <div class="sw"><div class="sw-chip" style="background:oklch(0.80 0.140 78)"></div><div class="sw-meta"><div class="sw-name">Warning</div><div class="sw-tok">--warn</div><div class="sw-val">amber · skipped</div></div></div>
+        <div class="sw"><div class="sw-chip" style="background:oklch(0.66 0.185 28)"></div><div class="sw-meta"><div class="sw-name">Danger</div><div class="sw-tok">--bad</div><div class="sw-val">coral · failed</div></div></div>
+        <div class="sw"><div class="sw-chip ring" style="background:#fff"></div><div class="sw-meta"><div class="sw-name">On-amber text</div><div class="sw-tok">#fff</div><div class="sw-val">header / primary label</div></div></div>
+      </div>
+
+      <div class="theme-tag dark">Dark neutrals — canonical</div>
+      <div class="grid sw-grid">
+        <div class="sw"><div class="sw-chip" style="background:oklch(0.185 0.010 65)"></div><div class="sw-meta"><div class="sw-name">Background</div><div class="sw-tok">--bg</div></div></div>
+        <div class="sw"><div class="sw-chip" style="background:oklch(0.225 0.012 65)"></div><div class="sw-meta"><div class="sw-name">Surface</div><div class="sw-tok">--surface</div></div></div>
+        <div class="sw"><div class="sw-chip" style="background:oklch(0.255 0.013 65)"></div><div class="sw-meta"><div class="sw-name">Surface raised</div><div class="sw-tok">--surface-2</div></div></div>
+        <div class="sw"><div class="sw-chip" style="background:oklch(0.31 0.012 65)"></div><div class="sw-meta"><div class="sw-name">Line</div><div class="sw-tok">--line</div></div></div>
+        <div class="sw"><div class="sw-chip" style="background:oklch(0.965 0.004 80)"></div><div class="sw-meta"><div class="sw-name">Ink</div><div class="sw-tok">--ink</div></div></div>
+        <div class="sw"><div class="sw-chip" style="background:oklch(0.66 0.012 70)"></div><div class="sw-meta"><div class="sw-name">Muted</div><div class="sw-tok">--muted</div></div></div>
+        <div class="sw"><div class="sw-chip" style="background:oklch(0.50 0.012 70)"></div><div class="sw-meta"><div class="sw-name">Faint</div><div class="sw-tok">--faint</div></div></div>
+        <div class="sw"><div class="sw-chip ring" style="background:oklch(0.27 0.012 65)"></div><div class="sw-meta"><div class="sw-name">Line soft</div><div class="sw-tok">--line-soft</div></div></div>
+      </div>
+
+      <div class="theme-tag light">Light neutrals</div>
+      <div class="grid sw-grid">
+        <div class="sw"><div class="sw-chip ring" style="background:#fff"></div><div class="sw-meta"><div class="sw-name">Background</div><div class="sw-tok">--bg</div></div></div>
+        <div class="sw"><div class="sw-chip ring" style="background:oklch(0.975 0.006 75)"></div><div class="sw-meta"><div class="sw-name">Surface</div><div class="sw-tok">--surface</div></div></div>
+        <div class="sw"><div class="sw-chip ring" style="background:oklch(0.945 0.008 75)"></div><div class="sw-meta"><div class="sw-name">Surface raised</div><div class="sw-tok">--surface-2</div></div></div>
+        <div class="sw"><div class="sw-chip ring" style="background:oklch(0.89 0.010 70)"></div><div class="sw-meta"><div class="sw-name">Line</div><div class="sw-tok">--line</div></div></div>
+        <div class="sw"><div class="sw-chip" style="background:oklch(0.255 0.014 60)"></div><div class="sw-meta"><div class="sw-name">Ink</div><div class="sw-tok">--ink</div></div></div>
+        <div class="sw"><div class="sw-chip" style="background:oklch(0.52 0.014 62)"></div><div class="sw-meta"><div class="sw-name">Muted</div><div class="sw-tok">--muted</div></div></div>
+        <div class="sw"><div class="sw-chip" style="background:oklch(0.63 0.012 65)"></div><div class="sw-meta"><div class="sw-name">Faint</div><div class="sw-tok">--faint</div></div></div>
+        <div class="sw"><div class="sw-chip ring" style="background:oklch(0.925 0.008 72)"></div><div class="sw-meta"><div class="sw-name">Line soft</div><div class="sw-tok">--line-soft</div></div></div>
+      </div>
+    </section>
+
+    <!-- ===================== TYPE ===================== -->
+    <section class="sec">
+      <div class="sec-head"><span class="sec-num">03</span><h2>Typography</h2></div>
+      <p class="sec-desc">A single neutral grotesque does the talking; a monospace handles figures, codes, and the all-caps kickers. No display faces — the system stays tool-like.</p>
+
+      <div class="grid families">
+        <div class="panel fam">
+          <div class="fam-glyphs" style="font-family:var(--sans)">Aa Bg 0123</div>
+          <div class="fam-name">Helvetica Neue / Arial</div>
+          <div class="fam-meta">Sans · UI &amp; headings · 500 / 600 / 700</div>
+        </div>
+        <div class="panel fam">
+          <div class="fam-glyphs" style="font-family:var(--mono)">Aa Bg 0123</div>
+          <div class="fam-name">SF Mono / system monospace</div>
+          <div class="fam-meta">Mono · figures, kickers, codes · 400 / 600</div>
+        </div>
+      </div>
+
+      <div class="panel" style="padding:8px 28px 16px">
+        <div class="type-row"><div class="type-spec"><b>Hero</b><br>27 / 700<br>-0.02em</div><div class="type-sample" style="font-size:27px;font-weight:700;letter-spacing:-0.02em">30 items · $148.20</div></div>
+        <div class="type-row"><div class="type-spec"><b>Wordmark</b><br>15 / 700<br>-0.01em</div><div class="type-sample" style="font-size:15px;font-weight:700;letter-spacing:-0.01em">Costco Cart Transfer</div></div>
+        <div class="type-row"><div class="type-spec"><b>Title</b><br>13.5 / 600</div><div class="type-sample" style="font-size:13.5px;font-weight:600">Open a Same-Day tab to begin</div></div>
+        <div class="type-row"><div class="type-spec"><b>Body</b><br>13 / 500</div><div class="type-sample" style="font-size:13px;font-weight:500">Jun 11 · 1:47 PM — transfer complete</div></div>
+        <div class="type-row"><div class="type-spec"><b>Caption</b><br>12 / 500</div><div class="type-sample" style="font-size:12px;font-weight:500;color:var(--muted)">28 matched · 2 need review</div></div>
+        <div class="type-row"><div class="type-spec"><b>Figure</b><br>mono · 12.5 / 600</div><div class="type-sample" style="font-family:var(--mono);font-size:12.5px;font-weight:600">$148.20 · 30 added</div></div>
+        <div class="type-row"><div class="type-spec"><b>Kicker</b><br>mono · 10.5 · 0.1em<br>uppercase</div><div class="type-sample" style="font-family:var(--mono);font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)">Cart ready</div></div>
+        <div class="type-row"><div class="type-spec"><b>Label / pill</b><br>mono · 9.5 · 0.06em<br>uppercase</div><div class="type-sample"><span style="font-family:var(--mono);font-size:9.5px;letter-spacing:0.06em;text-transform:uppercase;color:var(--coral);background:color-mix(in oklch,var(--coral) 14%,transparent);padding:3px 8px;border-radius:20px">Success</span></div></div>
+      </div>
+    </section>
+
+    <!-- ===================== SPACING / RADIUS / ELEVATION ===================== -->
+    <section class="sec">
+      <div class="sec-head"><span class="sec-num">04</span><h2>Space, radius &amp; elevation</h2></div>
+      <p class="sec-desc">A tight 380&nbsp;px popup needs a disciplined spacing ramp. Radii nest by two — outer shell 13, cards 11, controls 10. Elevation is sparing: one resting shadow, one for the floating popup, one warm glow under the primary action.</p>
+
+      <div class="grid triple">
+        <div class="panel card-pad">
+          <h3>Spacing ramp</h3>
+          <p>Base unit ≈ 4px, used for padding &amp; gaps.</p>
+          <div class="ramp">
+            <div class="ramp-row"><span class="ramp-tok">2xs</span><div class="ramp-bar" style="width:4px"></div><span class="ramp-px">4</span></div>
+            <div class="ramp-row"><span class="ramp-tok">xs</span><div class="ramp-bar" style="width:8px"></div><span class="ramp-px">8</span></div>
+            <div class="ramp-row"><span class="ramp-tok">sm</span><div class="ramp-bar" style="width:11px"></div><span class="ramp-px">11</span></div>
+            <div class="ramp-row"><span class="ramp-tok">md</span><div class="ramp-bar" style="width:14px"></div><span class="ramp-px">14</span></div>
+            <div class="ramp-row"><span class="ramp-tok">lg</span><div class="ramp-bar" style="width:16px"></div><span class="ramp-px">16</span></div>
+            <div class="ramp-row"><span class="ramp-tok">xl</span><div class="ramp-bar" style="width:24px"></div><span class="ramp-px">24</span></div>
+          </div>
+        </div>
+
+        <div class="panel card-pad">
+          <h3>Radius</h3>
+          <p>Nested by ~2px steps.</p>
+          <div class="radii">
+            <div class="radii-item"><div class="radii-box" style="border-radius:13px"></div><div class="radii-lbl">13 · shell</div></div>
+            <div class="radii-item"><div class="radii-box" style="border-radius:11px"></div><div class="radii-lbl">11 · card</div></div>
+            <div class="radii-item"><div class="radii-box" style="border-radius:10px"></div><div class="radii-lbl">10 · button</div></div>
+            <div class="radii-item"><div class="radii-box" style="border-radius:8px"></div><div class="radii-lbl">8 · icon tile</div></div>
+            <div class="radii-item"><div class="radii-box" style="border-radius:999px"></div><div class="radii-lbl">full · pill</div></div>
+          </div>
+        </div>
+
+        <div class="panel card-pad">
+          <h3>Elevation</h3>
+          <p>Shadows stay warm &amp; soft.</p>
+          <div class="elevs">
+            <div class="elev-row"><div class="elev-box e1"></div><div class="elev-meta"><b>Resting</b><span>cards, history rows</span></div></div>
+            <div class="elev-row"><div class="elev-box e3"></div><div class="elev-meta"><b>Floating</b><span>the popup itself</span></div></div>
+            <div class="elev-row"><div class="elev-box glow"></div><div class="elev-meta"><b>Action glow</b><span>primary button</span></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== COMPONENTS ===================== -->
+    <section class="sec">
+      <div class="sec-head"><span class="sec-num">05</span><h2>Components</h2></div>
+      <p class="sec-desc">The popup is assembled from six parts. Each is shown here on the canonical dark chrome; all are theme-aware via the token sets above.</p>
+
+      <!-- header -->
+      <div class="panel comp-card" style="margin-bottom:16px">
+        <div class="comp-head"><h3>Header bar</h3><span class="label">amber gradient · constant across themes</span></div>
+        <div class="comp-body">
+          <div class="stage on-dark chrome-dark">
+            <div class="cbox" style="box-shadow:none">
+              <div class="ph">
+                <div class="ph-top"><span class="ph-mark"><svg width="28" height="28" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="#fff"/><g fill="none" stroke="oklch(0.67 0.18 30)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M16 6 21.5 11 8.5 11"/><path d="M21.5 11 10.5 21"/><path d="M16 26 10.5 21 23.5 21"/></g></svg></span><span class="ph-name">Costco Cart Transfer</span></div>
+                <div class="ph-route"><span class="live"></span>Instacart → Costco Same-Day</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- status -->
+      <div class="panel comp-card" style="margin-bottom:16px">
+        <div class="comp-head"><h3>Status block</h3><span class="label">5 states · colored edge + kicker</span></div>
+        <div class="comp-body">
+          <div class="stage on-dark chrome-dark">
+            <div class="scolumn"><span class="scap" style="color:var(--amber)">info</span>
+              <div class="status s-info" style="width:300px"><span class="st-ico" style="background:color-mix(in oklch,var(--amber) 18%,transparent)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 11v6" stroke="var(--amber)" stroke-width="2.2" stroke-linecap="round"/><circle cx="12" cy="7.2" r="1.3" fill="var(--amber)"/></svg></span><div class="st-body"><div class="st-kicker">Action needed</div><div class="st-title">Open a Same-Day tab <span class="lo">to begin.</span></div></div></div>
+            </div>
+            <div class="scolumn"><span class="scap" style="color:var(--coral)">ready</span>
+              <div class="status s-ready" style="width:300px;align-items:flex-end"><div class="st-body"><div class="st-kicker">Cart ready</div><div class="st-hero"><span class="big">30</span><span class="cur">items · $148.20</span></div><div class="st-sub"><b>28 matched</b> · 2 need review</div></div></div>
+            </div>
+            <div class="scolumn"><span class="scap" style="color:var(--amber)">progress</span>
+              <div class="status s-progress" style="width:300px"><div class="st-body"><div class="st-kicker">Transferring</div><div class="st-title">Adding item <span class="lo">18 of 30…</span></div><div class="st-track"><div class="st-fill" style="width:60%"></div></div></div></div>
+            </div>
+            <div class="scolumn"><span class="scap" style="color:var(--ok)">done</span>
+              <div class="status s-done" style="width:300px"><span class="st-ico" style="background:color-mix(in oklch,var(--ok) 18%,transparent)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div class="st-body"><div class="st-kicker">Transfer complete</div><div class="st-title">30 added <span class="lo">· 0 skipped</span></div></div></div>
+            </div>
+            <div class="scolumn"><span class="scap" style="color:var(--bad)">error</span>
+              <div class="status s-error" style="width:300px"><span class="st-ico" style="background:color-mix(in oklch,var(--bad) 18%,transparent)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 7v6" stroke="var(--bad)" stroke-width="2.2" stroke-linecap="round"/><circle cx="12" cy="16.6" r="1.3" fill="var(--bad)"/></svg></span><div class="st-body"><div class="st-kicker">Can't continue</div><div class="st-title">Sign in to Costco <span class="lo">to transfer.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- buttons -->
+      <div class="panel comp-card" style="margin-bottom:16px">
+        <div class="comp-head"><h3>Buttons</h3><span class="label">primary · secondary · ghost · danger · disabled</span></div>
+        <div class="comp-body">
+          <div class="stage on-dark chrome-dark" style="gap:14px">
+            <button class="btn btn-primary"><svg width="15" height="15" viewBox="0 0 32 32"><g fill="none" stroke="#fff" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round"><path d="M16 6 21.5 11 8.5 11"/><path d="M21.5 11 10.5 21"/><path d="M16 26 10.5 21 23.5 21"/></g></svg>Transfer cart</button>
+            <button class="btn btn-secondary">Open Sameday</button>
+            <button class="btn btn-ghost">Clear history</button>
+            <button class="btn btn-danger">Clear Instacart cart</button>
+            <button class="btn" disabled>Transfer cart</button>
+          </div>
+          <div class="stage on-light chrome-light" style="gap:14px;margin-top:14px">
+            <button class="btn btn-primary"><svg width="15" height="15" viewBox="0 0 32 32"><g fill="none" stroke="#fff" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round"><path d="M16 6 21.5 11 8.5 11"/><path d="M21.5 11 10.5 21"/><path d="M16 26 10.5 21 23.5 21"/></g></svg>Transfer cart</button>
+            <button class="btn btn-secondary">Open Sameday</button>
+            <button class="btn btn-ghost">Clear history</button>
+            <button class="btn btn-danger">Clear Instacart cart</button>
+            <button class="btn" disabled>Transfer cart</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- history -->
+      <div class="panel comp-card">
+        <div class="comp-head"><h3>History row</h3><span class="label">status edge · pill · added / skipped / failed</span></div>
+        <div class="comp-body">
+          <div class="stage on-dark chrome-dark">
+            <div class="hrow"><span class="hbar ok"></span><div class="hmain"><div class="htop"><span class="hwhen">Jun 11 · 1:47 PM</span><span class="hpill ok">Success</span></div><div class="hstats"><span class="stat added"><b>30</b>added</span><span class="stat skip"><b>0</b>skipped</span><span class="stat fail"><b>0</b>failed</span></div></div></div>
+            <div class="hrow"><span class="hbar warn"></span><div class="hmain"><div class="htop"><span class="hwhen">May 13 · 6:55 AM</span><span class="hpill warn">All skipped</span></div><div class="hstats"><span class="stat added"><b>0</b>added</span><span class="stat skip"><b>33</b>skipped</span><span class="stat fail"><b>0</b>failed</span></div></div></div>
+            <div class="hrow"><span class="hbar bad"></span><div class="hmain"><div class="htop"><span class="hwhen">May 2 · 9:12 AM</span><span class="hpill bad">Failed</span></div><div class="hstats"><span class="stat added"><b>12</b>added</span><span class="stat skip"><b>1</b>skipped</span><span class="stat fail"><b>4</b>failed</span></div></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <p class="footer">Costco Cart Transfer · Design System v1.0 · Bold direction — tokens, type &amp; components are the source of truth for the extension popup.</p>
+  </div>
+</body>
+</html>

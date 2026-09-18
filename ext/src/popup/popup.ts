@@ -26,7 +26,11 @@ const $ = <T extends HTMLElement>(sel: string) => {
 };
 
 const statusEl = $<HTMLElement>("#status");
-const statusMsg = $<HTMLElement>("#status-msg");
+const statusKicker = $<HTMLElement>("#status-kicker");
+const statusTitle = $<HTMLElement>("#status-title");
+const statusIco = $<HTMLElement>("#status-ico");
+const statusTrack = $<HTMLElement>("#status-track");
+const routeDot = $<HTMLElement>("#route-dot");
 const controls = $<HTMLElement>("#controls");
 const transferBtn = $<HTMLButtonElement>("#transfer");
 const openIcBtn = $<HTMLButtonElement>("#open-instacart");
@@ -39,15 +43,45 @@ const resultTableBody = $<HTMLElement>("#result-table tbody");
 const resultWarnings = $<HTMLElement>("#result-warnings");
 const historyEl = $<HTMLElement>("#history");
 const historyList = $<HTMLElement>("#history-list");
+const historyCount = $<HTMLElement>("#history-count");
 const clearHistoryBtn = $<HTMLButtonElement>("#clear-history");
 const clearIcBtn = $<HTMLButtonElement>("#clear-instacart");
 const clearConfirmEl = $<HTMLElement>("#clear-confirm");
 const clearConfirmYesBtn = $<HTMLButtonElement>("#clear-confirm-yes");
 const clearConfirmNoBtn = $<HTMLButtonElement>("#clear-confirm-no");
 
-function setStatus(kind: "idle" | "working" | "ok" | "warn" | "bad", msg: string) {
-  statusEl.className = `status ${kind}`;
-  statusMsg.textContent = msg;
+// Status-block glyphs (static markup → innerHTML is safe; no user data).
+const GLYPH = {
+  info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+  warn: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>',
+  spinner: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 3a9 9 0 1 0 9 9"/></svg>',
+  swap: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4 3 8l4 4"/><path d="M3 8h14"/><path d="M17 20l4-4-4-4"/><path d="M21 16H7"/></svg>',
+} as const;
+
+type StatusKind = "idle" | "ready" | "working" | "ok" | "warn" | "bad";
+
+// Maps the orchestrator's status kinds onto the design system's status-block
+// variants (left-edge color, kicker, leading glyph). "ready"/"working"/"done"/
+// "error" mirror the documented states; "idle"=waiting, "warn"=partial outcome.
+const STATUS_META: Record<StatusKind, { variant: string; kicker: string; glyph: string; progress?: boolean }> = {
+  idle:    { variant: "s-info",     kicker: "Action needed",  glyph: GLYPH.info },
+  ready:   { variant: "s-ready",    kicker: "Ready",          glyph: GLYPH.swap },
+  working: { variant: "s-progress", kicker: "Working",        glyph: GLYPH.spinner, progress: true },
+  ok:      { variant: "s-done",     kicker: "Complete",       glyph: GLYPH.check },
+  warn:    { variant: "s-warn",     kicker: "Heads up",       glyph: GLYPH.warn },
+  bad:     { variant: "s-error",    kicker: "Can't continue", glyph: GLYPH.warn },
+};
+
+function setStatus(kind: StatusKind, title: string, opts: { kicker?: string } = {}) {
+  const meta = STATUS_META[kind];
+  statusEl.className = `status ${meta.variant}`;
+  statusKicker.textContent = opts.kicker ?? meta.kicker;
+  statusTitle.textContent = title;
+  statusIco.innerHTML = meta.glyph;
+  const showProgress = !!meta.progress;
+  statusTrack.hidden = !showProgress;
+  statusTrack.classList.toggle("indeterminate", showProgress);
 }
 
 // --- Tab helpers ------------------------------------------------------------
@@ -101,6 +135,7 @@ async function loadHistory(): Promise<void> {
   const data = await chrome.storage.local.get(HISTORY_KEY);
   const history: RunResult[] = Array.isArray(data[HISTORY_KEY]) ? data[HISTORY_KEY] : [];
   historyEl.hidden = history.length === 0;
+  historyCount.textContent = history.length ? String(history.length) : "";
   historyList.replaceChildren(...history.map(buildHistoryItem));
 }
 
@@ -118,26 +153,59 @@ function buildItemRows(items: RunItem[]): HTMLTableRowElement[] {
   });
 }
 
+// Maps a run outcome to the design system's status tone (edge bar + pill).
+function outcomeTone(outcome: RunResult["outcome"]): { tone: "ok" | "warn" | "bad"; label: string } {
+  if (outcome === "success") return { tone: "ok", label: "Success" };
+  if (outcome === "partial") return { tone: "warn", label: "Partial" };
+  return { tone: "bad", label: "Failed" };
+}
+
+// One ".stat" block (mono figure + label). Zero values dim to --faint so
+// non-zero counts pop, per the design system.
+function statBlock(kind: "added" | "skipped" | "failed", n: number): HTMLElement {
+  const el = document.createElement("span");
+  el.className = `stat ${kind}${n === 0 ? " zero" : ""}`;
+  const b = document.createElement("b");
+  b.textContent = String(n);
+  const label = document.createElement("span");
+  label.textContent = kind;
+  el.append(b, label);
+  return el;
+}
+
 function buildHistoryItem(r: RunResult): HTMLDetailsElement {
   const details = document.createElement("details");
   details.className = "history-item";
 
-  const summary = document.createElement("summary");
-  const dateSpan = document.createElement("span");
-  dateSpan.className = "h-date";
-  dateSpan.textContent = new Date(r.started_at).toLocaleString(undefined, {
-    month: "short", day: "numeric", hour: "numeric", minute: "2-digit",
-  });
-  const outcomeSpan = document.createElement("span");
-  outcomeSpan.className = `h-outcome ${r.outcome}`;
-  outcomeSpan.textContent = r.outcome;
   const added   = r.items.filter((i) => i.status === "added").length;
   const skipped = r.items.filter((i) => i.status.startsWith("skipped_")).length;
   const failed  = r.items.filter((i) => i.status === "failed").length;
-  const countsSpan = document.createElement("span");
-  countsSpan.className = "h-counts";
-  countsSpan.textContent = `${added} added · ${skipped} skipped · ${failed} failed`;
-  summary.append(dateSpan, " · ", outcomeSpan, " · ", countsSpan);
+  const { tone, label } = outcomeTone(r.outcome);
+
+  // Summary = the design's ".hrow"; expanding reveals the per-item table (extra).
+  const summary = document.createElement("summary");
+  summary.className = "hrow";
+
+  const bar = document.createElement("span");
+  bar.className = `hbar ${tone}`;
+
+  const top = document.createElement("div");
+  top.className = "hrow-top";
+  const when = document.createElement("span");
+  when.className = "hwhen";
+  when.textContent = new Date(r.started_at).toLocaleString(undefined, {
+    month: "short", day: "numeric", hour: "numeric", minute: "2-digit",
+  });
+  const pill = document.createElement("span");
+  pill.className = `hpill ${tone}`;
+  pill.textContent = label;
+  top.append(when, pill);
+
+  const stats = document.createElement("div");
+  stats.className = "hstats";
+  stats.append(statBlock("added", added), statBlock("skipped", skipped), statBlock("failed", failed));
+
+  summary.append(bar, top, stats);
 
   const table = document.createElement("table");
   table.className = "h-table";
@@ -180,10 +248,12 @@ function td(text: string): HTMLTableCellElement {
 
 function countBlock(label: string, n: number): HTMLElement {
   const span = document.createElement("span");
-  span.append(`${label} `);
-  const strong = document.createElement("strong");
-  strong.textContent = String(n);
-  span.append(strong);
+  span.className = "stat";
+  const b = document.createElement("b");
+  b.textContent = String(n);
+  const l = document.createElement("span");
+  l.textContent = label;
+  span.append(b, l);
   return span;
 }
 
@@ -202,10 +272,13 @@ async function detectAndWire() {
   clearIcBtn.hidden = !ic;
   clearConfirmEl.hidden = true;
 
+  const bothReady = !!(ic && sd);
+  routeDot.className = bothReady ? "ph-dot live" : "ph-dot warn";
+
   if (!ic && !sd) setStatus("idle", "Open an Instacart Costco tab and a Sameday tab.");
   else if (!ic)   setStatus("idle", "Open an Instacart Costco tab.");
   else if (!sd)   setStatus("idle", "Open a Sameday tab.");
-  else            setStatus("idle", "Ready. Click Transfer to begin.");
+  else            setStatus("ready", "Ready — click Transfer to begin.");
 
   controls.hidden = false;
 }
