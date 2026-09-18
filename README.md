@@ -35,7 +35,7 @@ npm run build:ext
 Then in Chrome:
 
 1. `chrome://extensions` → enable **Developer mode**.
-2. Click **Load unpacked**, pick `C:\Projects\github\costco-transfer\ext\`.
+2. Click **Load unpacked**, pick the generated `C:\Projects\github\costco-transfer\ext\dist\` folder. (You can also load `ext\` directly.)
 3. Pin the **Costco Cart Transfer** icon to the toolbar.
 4. Open Instacart Costco + Sameday (ZIP-gated page is fine). Click the icon → **Transfer cart**.
 
